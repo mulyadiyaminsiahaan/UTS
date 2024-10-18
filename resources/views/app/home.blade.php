@@ -100,6 +100,7 @@
             </div>
         </div>
     </div>
+    
 
     <!-- MODAL EDIT pinned -->
     <div class="modal fade" id="editPinned" tabindex="-1" aria-labelledby="editPinnedLabel" aria-hidden="true">
