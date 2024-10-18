@@ -2,6 +2,11 @@
 
 @section('content')
     <div class="container">
+        <div class="text-center">
+            <img src="{{ asset('assets/vendor/bootstrap-5.2.3-dist/image/card-checklist.svg') }}" alt="Logo" style="width: 100px; height: auto; filter: hue-rotate(200deg);">
+            <h2 class="mt-3" style="color: #0d6efd;">Catatan Mahasiswa</h2> <!-- Tulisan Catatan Mahasiswa -->
+            <p>Let's make a to-do list!</p>
+        </div>
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <div class="card">

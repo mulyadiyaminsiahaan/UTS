@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PinnedController;
 
 
 Route::prefix('auth')->group(function () {
@@ -15,4 +16,11 @@ Route::prefix('auth')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get("/", [HomeController::class, "index"])->name("home");
+
+    Route::prefix('pinned')->group(function () {
+        Route::post("/add", [PinnedController::class, "postAdd"])->name("post.pinned.add");
+        //tambahkan post edit dan delete
+        Route::post("/edit", [PinnedController::class, "postEdit"])->name("post.pinned.edit");
+        Route::post("/delete", [PinnedController::class, "postDelete"])->name("post.pinned.delete");
+    });
 });
