@@ -38,10 +38,10 @@
                                     </span>
 
                                     @enderror
-                                </div>
-                            </div>
+                                
+                        </div>
 
-                            <div class="form-group mb-2">
+                        <div class="form-group mb-2">
                             
                                 <label for="password">Kata Sandi</label>
                             
@@ -87,11 +87,9 @@
                         
                         <div class="text-end">
                         
-                            <button type="submit" class="btn btn-
-                        
-                            primary">
+                            <button type="submit" class="btn btn-primary">
     
-                            Masuk
+                                Masuk
                         
                             </button>
                         
