@@ -42,9 +42,17 @@ class AuthController extends Controller
 
     public function getLogin(Request $request)
     {
+        if (Auth::user()) {
+            return redirect()->route('home');
+        }
+
+        return view('auth.login');
+    }
+    public function postLogin(Request $request) 
+    {
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|email|max:255',
-            'password' => 'required|string|min:8',
+            'password' => 'required|string|min:6',
         ]);
 
         $validator->after(function ($validator) use ($request) {

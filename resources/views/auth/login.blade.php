@@ -71,7 +71,7 @@
                             
                             id="remember"
                             
-                            {{ old('remember') ? 'checked' :
+                            {{ old( 'remember' ) ? 'checked' : ''
                             
                             }}>
                             
