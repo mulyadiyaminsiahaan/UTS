@@ -54,11 +54,10 @@ role = "alret">
                                 </span>
                             @enderror
                         </div>
-                        <div class="text-end"
-                        <button type="submit" class="btn btn-
-primary">
-                            List
-                    </button>
+                        <div class="text-end">
+                        <button type="submit" class="btn btn-primary">
+                            Daftar
+                        </button>
 
                 </div>
                 <hr />
