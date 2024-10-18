@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-
 <html>
 
 <head>
-    <title>PABWE Praktikum 8</title>
+    <title>Catatan Mahasiswa</title>
     <link href="{{ asset('assets/vendor/bootstrap-5.2.3-dist/css/bootstrap.min.css') }}" rel="stylesheet" />
 </head>
 
