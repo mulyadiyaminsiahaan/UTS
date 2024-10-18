@@ -13,19 +13,25 @@ class AuthController extends Controller
     public function getRegister(Request $request)
     {
         if (Auth::user()) {
-            return redirect()->route('home');
+            return redirect()->route("home");
         }
 
-        return view('auth.register');
+        return view("auth.register");
     }
 
     public function postRegister(Request $request)
     {
-        $this->validate($request, [
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
         ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('register')
+                             ->withErrors($validator)
+                             ->withInput();
+        }
 
         $user = new User([
             'name' => $request->input('name'),
@@ -37,16 +43,16 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('home');
+        return redirect()->route("home");
     }
 
     public function getLogin(Request $request)
     {
         if (Auth::user()) {
-            return redirect()->route('home');
+            return redirect()->route("home");
         }
 
-        return view('auth.login');
+        return view("auth.login");
     }
     public function postLogin(Request $request) 
     {
@@ -71,14 +77,14 @@ class AuthController extends Controller
                 ->withInput();
         }
 
-        return redirect()->route('home');
+        return redirect()->route("home");
     }
 
     public function getlogout(request $request)
     {
         Auth::logout();
 
-        return redirect()->route('login');
+        return redirect()->route("login");
     }   
 }
     
