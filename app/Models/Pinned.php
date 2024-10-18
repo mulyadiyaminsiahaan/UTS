@@ -10,6 +10,7 @@ class Pinned extends Model
     protected $fillable = [
         'user_id',
         'pinned_id',
-        'pinned_type',
+        'header',
+        'notes',
     ];
 }

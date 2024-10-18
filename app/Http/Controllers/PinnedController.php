@@ -19,13 +19,15 @@ class PinnedController extends Controller
             "pinned" => $pinned,
         ];
 
-        return view("app.pinned", $data);
+        return redirect()->route('home');
     }
 
     public function postAdd(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'activity' => 'required|string|max:255',
+            'header' => 'required|string|max:255',
+            'notes' => 'required|string|max:255',
+
         ]); 
         
         if ($validator->fails()) {
@@ -37,8 +39,9 @@ class PinnedController extends Controller
         $sauth = Auth::user();
 
         Pinned::create([
-            'user_id' => $auth->id,
-            'activity' => $request->activity,
+            'user_id' => $sauth->id,
+            'header' => $request->header,
+            'notes' => $request->notes,
         ]);
 
         return redirect()->route('home');
@@ -48,8 +51,8 @@ class PinnedController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'id' => 'required|exits:pinned',
-            'activity' => 'required|string|max:255',
-            'status' => 'required|boolean',
+            'Header' => 'required|string|max:255',
+            'Notes' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -77,9 +80,10 @@ class PinnedController extends Controller
         ]); 
 
         if ($validator->fails()) {
-            return redirect()->route('home')
-                             ->withErrors($validator)
-                             ->withInput();
+            return redirect()
+            ->route('home')
+            ->withErrors($validator)
+            ->withInput();
         }
 
         $auth = Auth::user();
@@ -88,6 +92,11 @@ class PinnedController extends Controller
         if ($pinned) {
             $pinned->delete();
         }
+
+        $data = [
+            "auth" => $auth,
+            "pinned" => Pinned::where('user_id', $auth->id)->orderBy("created_at", "desc")->get(),
+        ];
 
         return view("app.pinned", $data);
     }

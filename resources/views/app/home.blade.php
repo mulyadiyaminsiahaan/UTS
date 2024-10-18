@@ -7,69 +7,48 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h3>Hay, <span class="text-primary">{{ $auth->name }}</span></h3>
-                            </div>
-                            <div>
-                                <a href="{{ route('logout') }}" class="btn btn-primary">Logout</a>
-                            </div>
+                            <h3>Hi, <span class="text-primary">{{ $auth->name }}</span></h3>
+                            <a href="{{ route('logout') }}" class="btn btn-primary">Logout</a>
                         </div>
 
                         <hr>
 
                         <div class="d-flex justify-content-between align-items-center">
-                            <h3>Your Note</h3>
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPinned">
-                                Add Note
-                            </button>
+                            <h3>Your Notes</h3>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPinned">Add Note</button>
                         </div>
 
                         <hr />
 
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Aktivitas</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Tanggal Dibuat</th>
-                                    <th scope="col">Tindakan</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (isset($pinned) && sizeof($pinned) > 0)
-                                    @php $counter = 1; @endphp
-                                    @foreach ($pinned as $pinnedItem)
-                                        <tr>
-                                            <td>{{ $counter++ }}</td>
-                                            <td>{{ $pinnedItem->activity }}</td>
-                                            <td>
-                                                @if ($pinnedItem->status)
-                                                    <span class="badge bg-success">Selesai</span>
-                                                @else
-                                                    <span class="badge bg-danger">Belum Selesai</span>
-                                                @endif
-                                            </td>
-                                            <td>{{ date('d F Y H:i', strtotime($pinnedItem->created_at)) }}</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-warning"
-                                                    onclick="showModalEditPinned({{ $pinnedItem->id }}, '{{ $pinnedItem->activity }}', {{ $pinnedItem->status }})">
-                                                    Ubah
-                                                </button>
-                                                <button class="btn btn-sm btn-danger"
-                                                    onclick="showModalDeletePinned({{ $pinnedItem->id }}, '{{ $pinnedItem->activity }}')">
-                                                    Hapus
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                @else
-                                    <tr>
-                                        <td colspan="5" class="text-center text-muted">Belum ada data tersedia!</td>
-                                    </tr>
-                                @endif
-                            </tbody>
-                        </table>
+                        <div class="row">
+                            @if (isset($pinned) && $pinned->count() > 0)
+                                @foreach ($pinned as $pinnedItem)
+                                    <div class="col-md-4 mb-3 pinned-card" id="card-{{ $pinnedItem->id }}" data-pinned="{{ $pinnedItem->status }}">
+                                        <div class="card {{ $pinnedItem->status ? 'border-primary' : '' }}">
+                                            <div class="card-body">
+                                                <h5 class="card-title">{{ $pinnedItem->header }}</h5>
+                                                <p class="card-text">{{ $pinnedItem->notes }}</p>
+                                                <div class="d-flex justify-content-between">
+                                                    <button class="btn btn-sm btn-warning"
+                                                            onclick="showModalEditPinned({{ $pinnedItem->id }}, '{{ $pinnedItem->header }}', '{{ $pinnedItem->notes }}', {{ $pinnedItem->status }})">
+                                                        Edit
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger"
+                                                            onclick="showModalDeletePinned({{ $pinnedItem->id }}, '{{ $pinnedItem->header }}')">
+                                                        Delete
+                                                    </button>
+                                                    <button class="btn btn-sm btn-info pinned-btn" onclick="togglePinned({{ $pinnedItem->id }})">
+                                                        {{ $pinnedItem->status ? 'Unpin' : 'Pin' }}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="col-12 text-center text-muted">No notes available!</div>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
@@ -84,12 +63,16 @@
                     <h5 class="modal-title" id="addPinnedLabel">Tambah Note</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ route('post.pinned.add') }}" method="POST">
+                <form action="{{ route('post.pinned.add') }}" method="POST" id="addPinnedForm">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="inputActivity" class="form-label">Aktivitas</label>
-                            <input type="text" name="activity" class="form-control" id="inputActivity" placeholder="Contoh: Belajar membuat aplikasi website sederhana">
+                            <label for="inputHeader" class="form-label">Header</label>
+                            <input type="text" name="header" class="form-control" id="inputHeader" placeholder="Contoh: Pertemuan Hari Senin" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputNotes" class="form-label">Notes</label>
+                            <input type="text" name="notes" class="form-control" id="inputNotes" placeholder="Contoh: Dilakukan pukul 08.00" required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -100,7 +83,6 @@
             </div>
         </div>
     </div>
-    
 
     <!-- MODAL EDIT pinned -->
     <div class="modal fade" id="editPinned" tabindex="-1" aria-labelledby="editPinnedLabel" aria-hidden="true">
@@ -115,8 +97,12 @@
                     <input name="id" type="hidden" id="inputEditPinnedId">
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="inputEditActivity" class="form-label">Aktivitas</label>
-                            <input type="text" name="activity" class="form-control" id="inputEditActivity" placeholder="Contoh: Belajar membuat aplikasi website sederhana">
+                            <label for="inputEditHeader" class="form-label">Header</label>
+                            <input type="text" name="header" class="form-control" id="inputEditHeader" placeholder="Contoh: Belajar membuat aplikasi website sederhana" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputEditNotes" class="form-label">Notes</label>
+                            <input type="text" name="notes" class="form-control" id="inputEditNotes" placeholder="Contoh: Belajar membuat aplikasi website sederhana" required>
                         </div>
                         <div class="mb-3">
                             <label for="selectEditStatus" class="form-label">Status</label>
@@ -145,7 +131,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        Kamu akan menghapus pinned <strong class="text-danger" id="deletePinnedActivity"></strong>. Apakah kamu yakin?
+                        Kamu akan menghapus pinned <strong class="text-danger" id="deletePinnedHeader"></strong>. Apakah kamu yakin?
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -164,30 +150,54 @@
 
 @section('other-js')
     <script>
-        function showModalEditPinned(pinnedId, activity, status) {
-            const modalEditPinned = document.getElementById("editPinned");
-            const inputId = document.getElementById("inputEditPinnedId");
-            const inputActivity = document.getElementById("inputEditActivity");
-            const selectStatus = document.getElementById("selectEditStatus");
+        function showModalEditPinned(pinnedId, header, notes, status) {
+            document.getElementById("inputEditPinnedId").value = pinnedId;
+            document.getElementById("inputEditHeader").value = header;
+            document.getElementById("inputEditNotes").value = notes;
+            document.getElementById("selectEditStatus").value = status;
 
-            inputId.value = pinnedId;
-            inputActivity.value = activity;
-            selectStatus.value = status;
-
-            var myModal = new bootstrap.Modal(modalEditPinned);
+            var myModal = new bootstrap.Modal(document.getElementById("editPinned"));
             myModal.show();
         }
 
-        function showModalDeletePinned(pinnedId, activity) {
-            const modalDeletePinned = document.getElementById("deletePinned");
-            const elementActivity = document.getElementById("deletePinnedActivity");
-            const inputId = document.getElementById("inputDeletePinnedId");
+        function showModalDeletePinned(pinnedId, header) {
+            document.getElementById("inputDeletePinnedId").value = pinnedId;
+            document.getElementById("deletePinnedHeader").innerText = header;
 
-            inputId.value = pinnedId;
-            elementActivity.innerText = activity;
-
-            var myModal = new bootstrap.Modal(modalDeletePinned);
+            var myModal = new bootstrap.Modal(document.getElementById("deletePinned"));
             myModal.show();
+        }
+
+        function togglePinned(pinnedId) {
+            const card = document.getElementById(`card-${pinnedId}`);
+            const isPinned = card.dataset.pinned === "1";
+            const pinnedBtn = card.querySelector('.pinned-btn');
+
+            fetch(`{{ url('your-toggle-pinned-route') }}/${pinnedId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: !isPinned })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    card.dataset.pinned = !isPinned ? "1" : "0";
+                    card.classList.toggle('border-primary');
+                    pinnedBtn.innerText = !isPinned ? 'Unpin' : 'Pin';
+
+                    // Reorder the cards based on pinned status
+                    const parent = card.parentNode;
+                    parent.removeChild(card);
+                    if (!isPinned) {
+                        parent.prepend(card); // Move to top if pinned
+                    } else {
+                        parent.append(card); // Move to bottom if unpinned
+                    }
+                }
+            });
         }
     </script>
 @endsection

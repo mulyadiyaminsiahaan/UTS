@@ -12,11 +12,11 @@ return new class extends Migration
 
     public function up() 
     {
-        Schema::create('pinned', function (Blueprint $table) {
+        Schema::create('pinneds', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->string('header')->nullable();
-            $table->string('notes')->nullable();
+            $table->string('header')->nullable()->default(null);
+            $table->string('notes')->nullable()->default(null);
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users');
